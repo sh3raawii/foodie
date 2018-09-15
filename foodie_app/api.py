@@ -154,3 +154,14 @@ def test_my_auth():
     print(g.get('user'))
     print(session)
     return '', 200
+
+
+@api.route('/users/badges/<id>', methods=["POST"])
+@login_required
+def assign_badge(id):
+    badge = Badge.query.filter(Badge.id == id).first()
+    if badge is None:
+        return 'badge id not found', 400
+    g.user.badges.append(badge)
+    return 'badge appended', 200
+
