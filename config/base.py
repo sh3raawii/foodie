@@ -10,3 +10,6 @@ class BaseConfig:
     # Database Configurations
     SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/test.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = True
+
+    # Authentication
+    JWT_SECRET_KEY = 'JWT_SECRET_KEY'

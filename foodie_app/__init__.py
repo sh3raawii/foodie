@@ -1,5 +1,7 @@
 from flask import Flask
 from config import get_app_config
+from flask_jwt_extended import JWTManager
+from flask_bcrypt import Bcrypt
 from .models import db, migrate
 from .api import api
 
@@ -14,6 +16,11 @@ def create_app(app_config=None):
     # init db
     db.init_app(app)
     migrate.init_app(app, db)
+
+    # register
+    flask_bcrypt = Bcrypt(app)
+    jwt = JWTManager(app)
+    app.json_encoder = JSONEncoder
 
     # register blueprints
     app.register_blueprint(api)
