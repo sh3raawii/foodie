@@ -195,7 +195,8 @@ def assign_recipe_to_user(user_id):
     recipe_name = body["label"]
     recipe_uri = body["uri"]
     recipe_score = body["score"]
-    user_history = UserHistory(user_id=user.id, recipe_name=recipe_name, recipe_uri=recipe_uri)
+    recipe_image_url = body["recipe_image_url"]
+    user_history = UserHistory(user_id=user.id, recipe_name=recipe_name, recipe_uri=recipe_uri, recipe_image_url=recipe_image_url)
     user.score += recipe_score
     db.session.add(user_history)
     db.session.commit()
@@ -209,4 +210,4 @@ def get_all_recipes_of_user(user_id):
     recipes = UserHistory.query.filter(UserHistory.user_id==user.id)
     recipes = list(recipes)
     recipes.sort(key=lambda x:x.timestamp)
-    return jsonify({"recipes": [{"label": recipe.recipe_name, "uri": recipe.recipe_uri, "timestamp": recipe.timestamp} for recipe in recipes]}), 200
+    return jsonify({"recipes": [{"label": recipe.recipe_name, "uri": recipe.recipe_uri, "timestamp": recipe.timestamp, "recipe_image_url": recipe.recipe_image_url} for recipe in recipes]}), 200

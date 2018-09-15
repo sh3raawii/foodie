@@ -36,3 +36,4 @@ class UserHistory(db.Model):
     recipe_name = db.Column(db.String(64), nullable=False)
     recipe_uri = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow, primary_key=True)
+    recipe_image_url = db.Column(db.Text, nullable=True)
