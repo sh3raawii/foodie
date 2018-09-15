@@ -68,7 +68,7 @@ def get_recipes():
                         for db_ing in db_ingredients:
                             if db_ing.name == ing:
                                 score += db_ing.gwp
-            recipes.append({"label": recipe["recipe"]["label"], "uri": recipe["recipe"]["shareAs"], "score": score, "image": recipe["recipe"]["image"]})
+            recipes.append({"label": recipe["recipe"]["label"], "uri": recipe["recipe"]["shareAs"], "score": 30/score/3, "image": recipe["recipe"]["image"]})
     recipes = list({recipe["uri"]: recipe for recipe in recipes}.values())
     recipes.sort(key=lambda x: x["score"])
     return jsonify({"recipes": [{"label": recipe["label"], "uri": recipe["uri"], "score": recipe["score"], "image": recipe["image"]} for recipe in recipes]})
