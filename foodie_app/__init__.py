@@ -1,8 +1,8 @@
 from flask import Flask
+from flask_cors import CORS
 from config import get_app_config
 from .models import db, migrate
 from .api import api
-from flask_cors import CORS
 
 
 def create_app(app_config=None):

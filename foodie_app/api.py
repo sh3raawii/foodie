@@ -167,35 +167,47 @@ def test_my_auth():
     return '', 200
 
 
-@api.route('/users/badges/<id>', methods=["POST"])
-@login_required
-def assign_badge(id):
-    badge = Badge.query.filter(Badge.id == id).first()
+@api.route('/users/<user_id>/badges/<badge_id>', methods=["POST"])
+def assign_badge(user_id, badge_id):
+    user = User.query.get(user_id)
+    if user is None:
+        return 'user is not found', 400
+    badge = Badge.query.get(badge_id)
     if badge is None:
-        return 'badge id not found', 400
-    g.user.badges.append(badge)
+        return 'badge is not found', 400
+    user.badges.append(badge)
     db.session.commit()
     return 'badge appended', 200
 
 
-@api.route('/users/badges', methods=["GET"])
-@login_required
-def get_user_badges():
-    return jsonify({"badges": [{"name": badge.name, "id": badge.id} for badge in g.user.badges]})
+@api.route('/users/<user_id>/badges', methods=["GET"])
+def get_user_badges(user_id):
+    user = User.query.get(user_id)
+    if user is None:
+        return 'user is not found', 400
+    return jsonify({"badges": [{"name": badge.name, "id": badge.id} for badge in user.badges]})
 
-@api.route('/users/recipes', methods=["POST"])
-@login_required
-def assign_recipe_to_user():
+@api.route('/users/<user_id>/recipes', methods=["POST"])
+def assign_recipe_to_user(user_id):
+    user = User.query.get(user_id)
+    if user is None:
+        return 'user is not found', 400
     body = request.json
-    user = UserHistory(user_id=g.user.id, recipe_name=body["label"], recipe_uri=body["uri"])
-    db.session.add(user)
+    recipe_name = body["label"]
+    recipe_uri = body["uri"]
+    recipe_score = body["score"]
+    user_history = UserHistory(user_id=user.id, recipe_name=recipe_name, recipe_uri=recipe_uri)
+    user.score += recipe_score
+    db.session.add(user_history)
     db.session.commit()
     return "added recipe to history", 200
 
-@api.route('/users/recipes', methods=["GET"])
-@login_required
-def get_all_recipes_of_user():
-    recipes = UserHistory.query.filter(UserHistory.user_id==g.user.id)
+@api.route('/users/<user_id>/recipes', methods=["GET"])
+def get_all_recipes_of_user(user_id):
+    user = User.query.get(user_id)
+    if user is None:
+        return 'user is not found', 400
+    recipes = UserHistory.query.filter(UserHistory.user_id==user.id)
     recipes = list(recipes)
     recipes.sort(key=lambda x:x.timestamp)
     return jsonify({"recipes": [{"label": recipe.recipe_name, "uri": recipe.recipe_uri, "timestamp": recipe.timestamp} for recipe in recipes]}), 200
