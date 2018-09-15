@@ -17,6 +17,8 @@ class User(db.Model):
     name = db.Column(db.String(25), nullable=False)
     password = db.Column(db.String(128), nullable=False)
     score = db.Column(db.Float, nullable=False, server_default="0")
+    badges = db.relationship('Badge', secondary=collection, lazy='dynamic',
+                                backref=db.backref('users', lazy='dynamic'))
 
 class Badge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
