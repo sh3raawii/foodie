@@ -129,7 +129,7 @@ def login():
     if authenticated:
         session["user_id"] = user.id
         session["authenticated"] = authenticated
-        return 'Success', 200
+        return jsonify({"status": "success", "id": user.id}), 200
     else:
         return 'Username or password is incorrect', 401
 
