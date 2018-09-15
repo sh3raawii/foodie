@@ -29,6 +29,7 @@ class User(db.Model):
 class Badge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(25), nullable=True)
+    extid = db.Column(db.Integer, nullable=True)
 
 class UserHistory(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, primary_key=True)

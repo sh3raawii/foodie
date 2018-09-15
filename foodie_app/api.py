@@ -34,15 +34,15 @@ def get_all_badges():
 @api.route('/badges', methods=["POST"])
 def create_badge():
     body = request.json
-    badge = Badge(name=body["name"])
+    badge = Badge(name=body["name"], extid=body["extid"])
     db.session.add(badge)
     db.session.commit()
-    return jsonify({"id": badge.id, "name": badge.name})
+    return jsonify({"id": badge.id, "name": badge.name, "extid": badge.extid})
 
 @api.route('/badges/<badge_id>', methods=["GET"])
 def get_badge_by_id(badge_id):
     badge = Badge.query.filter(Badge.id == badge_id).first()
-    return jsonify({"id": badge.id, "name": badge.name})
+    return jsonify({"id": badge.id, "name": badge.name, "extid": badge.extid})
 
 # Testing root endpoint
 @api.route('/', methods=['GET'])
