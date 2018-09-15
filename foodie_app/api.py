@@ -1,50 +1,54 @@
-from flask import Blueprint, request, jsonify
 import requests
-from foodie_app.models import db
-from foodie_app.models import Ingredient
-from foodie_app.models import Badge
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
+from foodie_app.models import db, Ingredient, Badge, User
+
 api = Blueprint('api', __name__)
 
+# Ingredients
 @api.route('/ingredients', methods=["POST"])
-def postNewIngredient():
-    dic = request.json
-    ingredient = Ingredient(name=dic["name"], gwp=dic["gwp"])
+def create_ingredient():
+    body = request.json
+    ingredient = Ingredient(name=body["name"], gwp=body["gwp"])
     db.session.add(ingredient)
     db.session.commit()
     return jsonify({"name": ingredient.name, "id": ingredient.id, "gwp": ingredient.gwp})
 
 @api.route('/ingredients/<id>', methods=["GET"])
-def getIngredientWith(id):
+def get_ingredient_by_id(id):
     ingredient = Ingredient.query.filter(Ingredient.id == id).first()
     return jsonify({"id": ingredient.id, "gwp": ingredient.gwp})
 
 @api.route('/ingredients', methods=["GET"])
-def getAllIngredients():
+def get_all_ingredients():
     ingredients = Ingredient.query.all()
     return jsonify({"ingredients": [{"name": ingredient.name, "id": ingredient.id, "gwp": ingredient.gwp} for ingredient in ingredients]})
 
+# Badges
 @api.route('/badges', methods=["GET"])
-def getAllBadges():
+def get_all_badges():
     badges = Badge.query.all()
     return jsonify({"badges": [{"name": badge.name, "id": badge.id} for badge in badges]})
 
 @api.route('/badges', methods=["POST"])
-def postNewBadge():
-    dic = request.json
-    badge = Badge(name=dic["name"])
+def create_badge():
+    body = request.json
+    badge = Badge(name=body["name"])
     db.session.add(badge)
     db.session.commit()
     return jsonify({"id": badge.id, "name": badge.name})
 
 @api.route('/badges/<id>', methods=["GET"])
-def getBadgeWith(id):
+def get_badge_by_id(id):
     badge = Badge.query.filter(Badge.id == id).first()
     return jsonify({"id": badge.id, "name": badge.name})
 
+# Testing root endpoint
 @api.route('/', methods=['GET'])
 def test():
-    return 'hello world'
+    return 'Welcome to foodie application'
 
+# Recipes
 @api.route('/recipes', methods=['POST'])
 def get_recipes():
     db_ingredients = Ingredient.query.all()
@@ -68,3 +72,45 @@ def get_recipes():
     recipes = list({recipe["uri"]: recipe for recipe in recipes}.values())
     recipes.sort(key=lambda x: x["score"])
     return jsonify({"recipes": [{"label": recipe["label"], "uri": recipe["uri"], "score": recipe["score"], "image": recipe["image"]} for recipe in recipes]})
+
+# User
+# @api.route('/users', methods=['POST'])
+# def create_user():
+#     if not request.is_json:
+#         return jsonify({"msg": "Missing JSON in request"}), 400
+#
+#     name = request.json.get('name', None)
+#     username = request.json.get('username', None)
+#     email = request.json.get('email', None)
+#     password = request.json.get('password', None)
+#
+#     if not name:
+#         return jsonify({"msg": "Missing name parameter"}), 400
+#     if not username:
+#         return jsonify({"msg": "Missing username parameter"}), 400
+#     if not email:
+#         return jsonify({"msg": "Missing email parameter"}), 400
+#     if not password:
+#         return jsonify({"msg": "Missing password parameter"}), 400
+#
+#
+#
+# @api.route('/login', methods=['POST'])
+# def login():
+#     if not request.is_json:
+#         return jsonify({"msg": "Missing JSON in request"}), 400
+#
+#     username = request.json.get('username', None)
+#     password = request.json.get('password', None)
+#
+#     if not username:
+#         return jsonify({"msg": "Missing username parameter"}), 400
+#     if not password:
+#         return jsonify({"msg": "Missing password parameter"}), 400
+#
+#     if username != 'test' or password != 'test':
+#         return jsonify({"msg": "Bad username or password"}), 401
+#
+#     # Identity can be any data that is json serializable
+#     access_token = create_access_token(identity=username)
+#     return jsonify(access_token=access_token), 200

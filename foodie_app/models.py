@@ -1,3 +1,4 @@
+import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
@@ -6,7 +7,7 @@ migrate = Migrate()
 
 class Ingredient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), nullable=True, default=" ")
+    name = db.Column(db.String(64), nullable=False)
     gwp = db.Column(db.Float, nullable=False)
 
 class User(db.Model):
@@ -15,6 +16,7 @@ class User(db.Model):
     email = db.Column(db.String(64),index=True, unique=True, nullable=False)
     name = db.Column(db.String(25), nullable=False)
     password = db.Column(db.String(128), nullable=False)
+    score = db.Column(db.Float, nullable=False, server_default="0")
 
 class Badge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -24,3 +26,9 @@ collection = db.Table('collection',
                        db.Column('user_id', db.Integer, db.ForeignKey('user.id'), nullable=False),
                        db.Column('badge_id', db.Integer, db.ForeignKey('badge.id'), nullable=False),
                        db.PrimaryKeyConstraint('user_id', 'badge_id'))
+
+class UserHistory(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, primary_key=True)
+    recipe_name = db.Column(db.String(64), nullable=False)
+    recipe_uri = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow, primary_key=True)
