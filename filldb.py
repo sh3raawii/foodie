@@ -10,6 +10,6 @@ with app.app_context():
     wb = xlrd.open_workbook('data.xlsx')
     sh = wb.sheet_by_name('Sheet1')
     for rownum in range(2, sh.nrows):
-        ingredient = Ingredient(name=sh.row_values(rownum)[0].lower(), gwp=float(sh.row_values(rownum)[1]))
+        ingredient = Ingredient(name=sh.row_values(rownum)[0].lower(), gwp=float(sh.row_values(rownum)[1]), image=sh.row_values(rownum)[4])
         db.session.add(ingredient)
     db.session.commit()
