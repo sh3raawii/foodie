@@ -9,6 +9,7 @@ class Ingredient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     gwp = db.Column(db.Float, nullable=False)
+    image = db.Column(db.Text)
 
 collection = db.Table('collection',
                        db.Column('user_id', db.Integer, db.ForeignKey('user.id'), nullable=False),
