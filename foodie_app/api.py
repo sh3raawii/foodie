@@ -1,5 +1,6 @@
 import requests
-from flask import Blueprint, request, jsonify, session
+from functools import wraps
+from flask import Blueprint, request, jsonify, session, g
 from foodie_app.models import db, Ingredient, Badge, User
 from passlib.hash import pbkdf2_sha256
 
@@ -133,6 +134,23 @@ def login():
 
 @api.route('/logout', methods=['POST'])
 def logout():
-    session.pop('authenticated', None)
-    session.pop('user_id', None)
+    session.clear()
+    return '', 200
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "authenticated" in session:
+            g.user = User.query.filter(User.id == session.get("user_id")).first()
+            return f(*args, **kwargs)
+        return 'You have to login again', 401
+    return decorated_function
+
+
+@api.route('/testauth', methods=['GET'])
+@login_required
+def test_my_auth():
+    print(g.get('user'))
+    print(session)
     return '', 200
