@@ -163,5 +163,11 @@ def assign_badge(id):
     if badge is None:
         return 'badge id not found', 400
     g.user.badges.append(badge)
+    db.session.commit()
     return 'badge appended', 200
 
+
+@api.route('/users/badges', methods=["GET"])
+@login_required
+def get_user_badges():
+    return jsonify({"badges": [{"name": badge.name, "id": badge.id} for badge in g.user.badges]})
