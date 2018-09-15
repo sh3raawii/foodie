@@ -1,7 +1,7 @@
 import requests
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
+from flask import Blueprint, request, jsonify, session
 from foodie_app.models import db, Ingredient, Badge, User
+from passlib.hash import pbkdf2_sha256
 
 api = Blueprint('api', __name__)
 
@@ -74,43 +74,65 @@ def get_recipes():
     return jsonify({"recipes": [{"label": recipe["label"], "uri": recipe["uri"], "score": recipe["score"], "image": recipe["image"]} for recipe in recipes]})
 
 # User
-# @api.route('/users', methods=['POST'])
-# def create_user():
-#     if not request.is_json:
-#         return jsonify({"msg": "Missing JSON in request"}), 400
-#
-#     name = request.json.get('name', None)
-#     username = request.json.get('username', None)
-#     email = request.json.get('email', None)
-#     password = request.json.get('password', None)
-#
-#     if not name:
-#         return jsonify({"msg": "Missing name parameter"}), 400
-#     if not username:
-#         return jsonify({"msg": "Missing username parameter"}), 400
-#     if not email:
-#         return jsonify({"msg": "Missing email parameter"}), 400
-#     if not password:
-#         return jsonify({"msg": "Missing password parameter"}), 400
-#
-#
-#
-# @api.route('/login', methods=['POST'])
-# def login():
-#     if not request.is_json:
-#         return jsonify({"msg": "Missing JSON in request"}), 400
-#
-#     username = request.json.get('username', None)
-#     password = request.json.get('password', None)
-#
-#     if not username:
-#         return jsonify({"msg": "Missing username parameter"}), 400
-#     if not password:
-#         return jsonify({"msg": "Missing password parameter"}), 400
-#
-#     if username != 'test' or password != 'test':
-#         return jsonify({"msg": "Bad username or password"}), 401
-#
-#     # Identity can be any data that is json serializable
-#     access_token = create_access_token(identity=username)
-#     return jsonify(access_token=access_token), 200
+@api.route('/users', methods=['GET'])
+def list_users():
+    users = User.query.all()
+    return jsonify({"users": [{"name": user.name, "id": user.id, "email": user.email, "username": user.username} for user in users]})
+
+@api.route('/users', methods=['POST'])
+def create_user():
+    if not request.is_json:
+        return jsonify({"msg": "Missing JSON in request"}), 400
+
+    name = request.json.get('name', None)
+    username = request.json.get('username', None)
+    email = request.json.get('email', None)
+    password = request.json.get('password', None)
+
+    if not name:
+        return jsonify({"msg": "Missing name parameter"}), 400
+    if not username:
+        return jsonify({"msg": "Missing username parameter"}), 400
+    if not email:
+        return jsonify({"msg": "Missing email parameter"}), 400
+    if not password:
+        return jsonify({"msg": "Missing password parameter"}), 400
+
+    password = pbkdf2_sha256.hash(password)
+    user = User(name=name, username=username, email=email, password=password, score=0)
+    db.session.add(user)
+    try:
+        db.session.commit()
+        return '', 200
+    except Exception as exception:
+        db.session.rollback()
+        db.session.flush()
+        return 'User Already Exists', 400
+
+@api.route('/login', methods=['POST'])
+def login():
+    if not request.is_json:
+        return jsonify({"msg": "Missing JSON in request"}), 400
+
+    username = request.json.get('username', None)
+    password = request.json.get('password', None)
+
+    if not username:
+        return jsonify({"msg": "Missing username parameter"}), 400
+    if not password:
+        return jsonify({"msg": "Missing password parameter"}), 400
+
+    user = User.query.filter(User.username == username).first()
+    authenticated = pbkdf2_sha256.verify(password, user.password)
+    if authenticated:
+        session["user_id"] = user.id
+        session["authenticated"] = authenticated
+        return 'Success', 200
+    else:
+        return 'Username or password is incorrect', 401
+
+@api.route('/logout', methods=['POST'])
+def logout():
+    session.pop('authenticated', None)
+    session.pop('user_id', None)
+    return '', 200
