@@ -23,7 +23,7 @@ def get_ingredient_by_id(id):
 @api.route('/ingredients', methods=["GET"])
 def get_all_ingredients():
     ingredients = Ingredient.query.all()
-    return jsonify({"ingredients": [{"name": ingredient.name, "id": ingredient.id, "gwp": ingredient.gwp} for ingredient in ingredients]})
+    return jsonify({"ingredients": [{"name": ingredient.name, "id": ingredient.id, "gwp": ingredient.gwp, "image": ingredient.image} for ingredient in ingredients]})
 
 # Badges
 @api.route('/badges', methods=["GET"])
