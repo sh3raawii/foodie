@@ -62,6 +62,7 @@ def get_recipes():
         res = res.json().get("hits", None)
         for recipe in res:
             score = 1
+            count = 0
             for res_ing in recipe["recipe"]["ingredientLines"]:
                 res_ing = res_ing.lower()
                 for ing in ingredients:
