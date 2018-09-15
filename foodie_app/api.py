@@ -184,7 +184,7 @@ def get_user_badges(user_id):
     user = User.query.get(user_id)
     if user is None:
         return 'user is not found', 400
-    return jsonify({"badges": [{"name": badge.name, "id": badge.id} for badge in user.badges]})
+    return jsonify({"badges": [{"name": badge.name, "id": badge.id, "extid": badge.extid} for badge in user.badges]})
 
 @api.route('/users/<user_id>/recipes', methods=["POST"])
 def assign_recipe_to_user(user_id):
