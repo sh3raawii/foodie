@@ -15,9 +15,9 @@ def create_ingredient():
     db.session.commit()
     return jsonify({"name": ingredient.name, "id": ingredient.id, "gwp": ingredient.gwp})
 
-@api.route('/ingredients/<id>', methods=["GET"])
-def get_ingredient_by_id(id):
-    ingredient = Ingredient.query.filter(Ingredient.id == id).first()
+@api.route('/ingredients/<ingredient_id>', methods=["GET"])
+def get_ingredient_by_id(ingredient_id):
+    ingredient = Ingredient.query.filter(Ingredient.id == ingredient_id).first()
     return jsonify({"id": ingredient.id, "gwp": ingredient.gwp})
 
 @api.route('/ingredients', methods=["GET"])
@@ -39,9 +39,9 @@ def create_badge():
     db.session.commit()
     return jsonify({"id": badge.id, "name": badge.name})
 
-@api.route('/badges/<id>', methods=["GET"])
-def get_badge_by_id(id):
-    badge = Badge.query.filter(Badge.id == id).first()
+@api.route('/badges/<badge_id>', methods=["GET"])
+def get_badge_by_id(badge_id):
+    badge = Badge.query.filter(Badge.id == badge_id).first()
     return jsonify({"id": badge.id, "name": badge.name})
 
 # Testing root endpoint
@@ -62,7 +62,6 @@ def get_recipes():
         res = res.json().get("hits", None)
         for recipe in res:
             score = 1
-            count = 0
             for res_ing in recipe["recipe"]["ingredientLines"]:
                 res_ing = res_ing.lower()
                 for ing in ingredients:
@@ -79,14 +78,14 @@ def get_recipes():
 @api.route('/users', methods=['GET'])
 def list_users():
     users = User.query.all()
-    return jsonify({"users": [{"name": user.name, "id": user.id, "email": user.email, "username": user.username} for user in users]})
+    return jsonify({"users": [{"name": user.name, "id": user.id, "email": user.email, "username": user.username, "score": user.score} for user in users]})
 
 
-@api.route('/users/<id>', methods=['GET'])
-def get_user_by_id(id):
-    user = User.query.get(id)
+@api.route('/users/<user_id>', methods=['GET'])
+def get_user_by_id(user_id):
+    user = User.query.get(user_id)
     if user:
-        return jsonify({"users": {"name": user.name, "id": user.id, "email": user.email, "username": user.username}})
+        return jsonify({"name": user.name, "id": user.id, "email": user.email, "username": user.username, "score": user.score})
     else:
         return 'Couldn\'t find user with id {}'.format(id), 400
 
