@@ -1,7 +1,7 @@
 import requests
 from functools import wraps
 from flask import Blueprint, request, jsonify, session, g
-from foodie_app.models import db, Ingredient, Badge, User
+from foodie_app.models import db, Ingredient, Badge, User, UserHistory
 from passlib.hash import pbkdf2_sha256
 
 api = Blueprint('api', __name__)
@@ -171,3 +171,20 @@ def assign_badge(id):
 @login_required
 def get_user_badges():
     return jsonify({"badges": [{"name": badge.name, "id": badge.id} for badge in g.user.badges]})
+
+@api.route('/users/recipes', methods=["POST"])
+@login_required
+def assign_recipe_to_user():
+    body = request.json
+    user = UserHistory(user_id=g.user.id, recipe_name=body["label"], recipe_uri=body["uri"])
+    db.session.add(user)
+    db.session.commit()
+    return "added recipe to history", 200
+
+@api.route('/users/recipes', methods=["GET"])
+@login_required
+def get_all_recipes_of_user():
+    recipes = UserHistory.query.filter(UserHistory.user_id==g.user.id)
+    recipes = list(recipes)
+    recipes.sort(key=lambda x:x.timestamp)
+    return jsonify({"recipes": [{"label": recipe.recipe_name, "uri": recipe.recipe_uri, "timestamp": recipe.timestamp} for recipe in recipes]}), 200
