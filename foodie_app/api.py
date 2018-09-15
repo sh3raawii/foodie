@@ -81,6 +81,16 @@ def list_users():
     users = User.query.all()
     return jsonify({"users": [{"name": user.name, "id": user.id, "email": user.email, "username": user.username} for user in users]})
 
+
+@api.route('/users/<id>', methods=['GET'])
+def get_user_by_id(id):
+    user = User.query.get(id)
+    if user:
+        return jsonify({"users": {"name": user.name, "id": user.id, "email": user.email, "username": user.username}})
+    else:
+        return 'Couldn\'t find user with id {}'.format(id), 400
+
+
 @api.route('/users', methods=['POST'])
 def create_user():
     if not request.is_json:
