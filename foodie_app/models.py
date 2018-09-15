@@ -6,8 +6,8 @@ migrate = Migrate()
 
 class Ingredient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), nullable=True, default=" ")
     gwp = db.Column(db.Float, nullable=False)
-
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
