@@ -1,0 +1,33 @@
+<ion-header>
+    <ion-navbar>
+      <ion-title>Ingredient Game</ion-title>
+    </ion-navbar>
+  </ion-header>
+  
+  <ion-content padding>
+    <h2>Welcome to Recipe Hero!</h2>
+    <h3>Select 3 ingredients</h3>
+    <div class="main-game">
+        <ion-card>
+            <img [src]="ingredient_url" />
+            <ion-card-content>
+              <ion-card-title>
+                {{currentItem.name}}
+                </ion-card-title>
+              <p>
+                Global warming potential: {{currentItem.gwp}}
+              </p>
+            </ion-card-content>
+            <ion-item>
+                <button ion-button color="danger" clear item-start icon-only large (click)="nextItem()">
+                    <ion-icon name="close-circle-outline"></ion-icon>
+                </button>
+                <button ion-button color="secondary" clear item-end icon-only large (click)="select()">
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                </button>
+            </ion-item>
+        </ion-card>
+    </div>
+    
+  </ion-content>
+  

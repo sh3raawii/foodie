@@ -1,0 +1,40 @@
+<ion-header>
+    <ion-navbar>
+      <ion-title>Home</ion-title>
+    </ion-navbar>
+  </ion-header>
+  
+  
+  <ion-content padding>
+    <h2>Welcome to Recipe Hero</h2>
+    <div class="login-form" *ngIf="!loggedIn">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Login</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+            <ion-item>
+                <ion-label fixed>Username</ion-label>
+                <ion-input type="text" value="" [(ngModel)]="username"></ion-input>
+              </ion-item>
+              <ion-item>
+                <ion-label fixed>Password</ion-label>
+                <ion-input type="password"[(ngModel)]="password"></ion-input>
+              </ion-item>
+              <button ion-button block color="secondary"(click)="login()">Sign In</button>
+              <button ion-button clear color="primary" (click)="goToRegistration()">Registration</button>
+              <button ion-button clear color="primary" >Forgot password</button>
+        </ion-card-content>
+      </ion-card>
+    </div>
+    <div *ngIf="loggedIn">
+        <h2>Hi, {{username}}</h2>
+        <ul>Your information
+          <li>Name: {{user.name}}</li>
+          <li>Email: {{user.email}} </li>
+          <li>Score: {{user.score}}</li>
+        </ul>
+        <button ion-button block color="primary"(click)="start()">Go To Ingredient Matching</button>
+    </div>
+
+  </ion-content>
